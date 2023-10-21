@@ -1,15 +1,30 @@
 #include <Arduino.h>
 
-const uint8_t ledPin = 13;
+void zeroCrossingInterrupt();
+
+const int zeroCrossingPin = 2; 
+
+uint32_t lastTime;
+
+volatile uint32_t SemicyclesCounter = 0;  
 
 void setup() {
-	pinMode(ledPin,OUTPUT);
+  pinMode(zeroCrossingPin, INPUT);
+  attachInterrupt(digitalPinToInterrupt(zeroCrossingPin), zeroCrossingInterrupt, RISING);
+  Serial.begin(9600);
+	lastTime = millis();
 }
 
 void loop() {
-	digitalWrite(ledPin,HIGH);
-	delay(500);
-	digitalWrite(ledPin,LOW);
-	delay(500);
+	if(millis() - lastTime >= 1000){
+		Serial.println(SemicyclesCounter);
+		SemicyclesCounter = 0;
+		lastTime = millis();
+	}
+  
+}
+
+void zeroCrossingInterrupt() {
+  ++SemicyclesCounter;
 }
 
